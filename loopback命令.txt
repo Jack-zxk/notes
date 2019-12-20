@@ -1,0 +1,16 @@
+﻿lb [名称]   				项目的名称
+lb model [名称]    			模型的名称，相当于Java中的对象
+lb datasource 				连接数据库
+
+
+
+
+extend api				扩展api
+
+var currentDate = new Date（）；	获取当前时间
+currentDate.getHours();			获取小时
+
+
+acl
+remote hook  ？钩子函数？  beforeRemote（）  afterRemote（）
+  create saving 

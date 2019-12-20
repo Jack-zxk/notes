@@ -1,0 +1,21 @@
+﻿
+在新窗口中打开
+	...
+	<head>
+	<base href="" target="_blank">
+	</head>
+	
+<meta>元素定义针对搜素引擎的关键字 ui,web前端开发
+	<head>
+		<meta content="ui,web前端开发" />
+	</head>
+	
+<nav> 可以拖动的导航区域
+
+<cite>对书名的引用</cite>
+
+<img src="" alt=""/>
+<iframe>框架
+
+<article draggable="true">可以拖动的文字</article>
+

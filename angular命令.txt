@@ -1,0 +1,152 @@
+﻿ng g c pages/todo //创建component
+
+ng g i model/todo //创建interface
+
+ng serve --open   //运行项目
+
+ng new 【项目名】 //创建项目
+
+	它还会创建下列工作区和初始项目的文件：
+
+	新的工作区，其根目录名叫 【项目名】。
+
+	一个最初的骨架应用项目，同样叫做 【项目名】（位于 src 子目录下）。
+
+	一个端到端测试项目（位于 e2e 子目录下）。
+
+	相关的配置文件。
+
+ng serve --host0.0.0.0 port4201  //更改端口运行项目 默认端口4200
+
+
+
+Angular组件
+	新建的项目默认组件：
+	app.component.ts— 组件的类代码，这是用 TypeScript 写的。
+	app.component.html— 组件的模板，这是用 HTML 写的。
+	app.component.css— 组件的私有 CSS 样式。
+	
+	.html文件是展示到页面的内容，使用{{}}来绑定.ts中的内容
+	
+创建英雄列表组件
+	ng generate compontent heroes
+	
+	.ts文件中
+	CLI 自动生成了三个元数据属性：
+	selector— 组件的选择器（CSS 元素选择器）
+	templateUrl— 组件模板文件的位置。
+	styleUrls— 组件私有 CSS 样式表文件的位置。
+	
+	新建英雄展示： 
+	在外壳英雄中的.html文件中，使用<app-英雄名></app-英雄名>来展示内容
+	
+创建hero类：
+	
+	hero.ts
+		export class Hero {
+		id: number;
+		name: string;
+			}
+	导入hero类：
+		某个ts文件头部加入
+		import {Hero} from ‘hero.ts所在的路径’；
+	使用hero类：
+		在某个.ts文件中加入
+		hero: Hero = {
+			id: 1,
+			name: 'zzb',
+			};
+	
+	{{hero.name | uppercase}}
+	uppercase：管道 是格式化字符串、金额、日期和其它显示数据的好办法
+	
+双向绑定：
+	[(ngModel)] 是 Angular 的双向数据绑定语法。
+	在新使用[(ngModel)]命令时，程序会报错，原因缺少 FormsModule
+	在src/app/app.module.ts文件中引入
+	import { FormsModule } from '@angular/forms'; // <-- NgModel lives here
+	
+	@NgModule({
+	  declarations: [
+		AppComponent,
+		HeroesComponent
+	  ],
+	  imports: [
+		BrowserModule,
+		FormsModule
+	  ],
+
+AppModel：
+	Angular 需要知道如何把应用程序的各个部分组合到一起，
+	以及该应用需要哪些其它文件和库。 这些信息被称为元数据（metadata）
+
+	遍历数组中的数据进行展示 *ngFor=“”
+	<ul class="heroes">
+		<li *ngFor="let hero of heroes">
+		  <span class="badge">{{hero.id}}</span> {{hero.name}}
+		</li>
+	 </ul>
+
+	
+	*ngIf="" 判断是否有数据
+
+主从主件
+
+
+
+服务
+	ng generate service hero
+	生成HeroService类的骨架
+	
+	@Injectable（）服务
+	依赖注入
+	
+	@Injectable() 装饰器会接受该服务的元数据对象，就像 @Component() 对组件类的作用一样。
+
+问题：
+	在自动生成的service骨架文件中少了providedIn: 'root',
+	@Injectable({
+		providedIn: 'root',
+	})
+	解决：
+	在app.module.ts文件中引入service文件，
+	providers：[]加入所引入的service
+
+	
+路由
+	使用 RouterModule 中的 Routes 类来配置路由器，所以还要从 @angular/router 库中导入这两个符号。
+	典型的 Angular 路由（Route）有两个属性：
+		path：一个用于匹配浏览器地址栏中 URL 的字符串。
+		component：当导航到此路由时，路由器应该创建哪个组件。
+	路由出口
+		.html页面中使用标签：<router-outlet> </router-outlet> 
+		
+	默认路由
+		{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+	
+HTTP：
+	导入http模块
+	增删改查
+	put、delete、update、get
+	
+
+架构概览：
+	基本构造块是NgModule
+		组件定义视图，组件使用服务
+		组件和服务都是简单的类
+
+模块：
+	每个 Angular 应用都有一个根模块，通常命名为 AppModule。
+	根模块提供了用来启动应用的引导机制。 一个应用通常会包含很多功能模块。
+	
+组件：
+	每个 Angular 应用都至少有一个组件，也就是根组件，它会把组件树和页面中的 DOM 连接起来。 
+	每个组件都会定义一个类，其中包含应用的数据和逻辑，并与一个 HTML 模板相关联，
+	该模板定义了一个供目标环境下显示的视图。
+	
+数据绑定：
+	事件绑定让你的应用可以通过更新应用的数据来响应目标环境下的用户输入。
+	属性绑定让你将从应用数据中计算出来的值插入到 HTML 中。
+
+	
+	

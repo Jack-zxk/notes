@@ -1,0 +1,151 @@
+﻿Why Apache Kafka Data is very important？
+
+availability有效的  scalability?量的 integration一体化的
+
+zookeeper
+
+broker
+
+topic
+
+partitioner
+
+producer（线程安全）
+ 底层封装二进制协议，定义二进制字符数组，通过socket发送给broker，broker处理完成后返回给producer。
+	
+	producer首先使用一个线程（用户主线程，启动producer的线程）
+	将消息封装给一个ProducerRecord实例，将消息序列化之后发送给partitioner
+	后者确定分区发送给位于producer程序中的一块内存缓冲区
+	producer的另一个线程负责从提取出来 封装成一个批次 发送给broker
+
+消息分区机制
+
+    分区策略
+	确定将消息发送到指定的topic的哪一个分区中 partitions
+	提供了分区策略以及对应的分区器
+	默认partitions会尽力保证相同的key存入到相同的分区上
+	  如果消息没有指定key，轮询的方式均匀分配到topic的所有分区上
+
+    自定义分区机制
+	在Producer程序中创建一个类 实现partitioner接口，主要分区逻辑在partitioner.partition中实现
+	在用于构造kafkaproducer的properties对象设置partitioner.class参数
+
+无消息丢失配置
+	
+	Java版本的producer用户采用的是异步发送机制
+	当出现网络延迟的时候可能会出现乱序，也可能出现消息丢失
+
+consumer（线程不安全）
+	consumer group 
+	消费者使用一个消费者组名来标记自己，topic的每条消息都会被发送到每个订阅它的消费者组的一个消费者实例上
+
+	位移（offset）
+	每个consumer实例都会为它消费的分区维护属于自己的位置信息来记录当前消费了多少条数据
+		好多消息引擎会将消费端的offset保存在服务器端（broker），实现简单，但是会有3个方面的问题
+		broker变成有状态的  增加同步成本 影响伸缩性
+		需要引入应答机制来确认消费成功
+		需要保存许多的consumer的offset 造成资源浪费
+	kafka选择让consumer group 保存offset
+
+	位移提交（offset commit）
+	consumer客户端需要定期的向kafka集群汇报消费数据的进度
+		新版本与旧版本提交的方式截然不同
+		旧版本提交到zookeeper的固定节点上，新版本提交到kafka的一个内部topic中（__consumer_offsets）
+
+	消费者组重平衡 rebalance 
+		本质上是一种协议
+	
+
+	消息轮询
+	
+
+	consumer位移
+	  consumer端需要为每个它要读取的分区保存消费的进度，即分区中当前消费信息的最新位置，该位置就被称为位移
+
+	每个线程维护一个KafkaConsumer
+	单kafkaConsumer实例+多worker线程
+
+
+producer 三种发送机制
+	1：发送 不管成功或者失败 继续发送资料
+	2：同步发送 送给broker broker返回成功之后  在发送下一笔资料
+	3：异步发送  非同步资料发送 new BrokerAckCallback
+
+		为保证消息的顺序 设置成1
+		保证消息不丢失    设置   acks  ，all
+		控制producer送到broker时 回应不是成功时 设置重新发送的次数，直到成功  retries
+		
+		key value serialzer 序列化器
+consumer groups
+	groupid 
+	
+		在有4个分区的情况下，只有一个consumer，消费的分区（partition）顺序为可能为随机的 
+		添加一个consumer之后 先回收partition，然后再分配。 每个consumer消费两个partition
+		consumer数量超过partition数量的话，多余的会运行 但意义不大，相当于做个备用
+
+	rebalance
+		当有新的consumer加入group的时候，或者consumer关掉或者down的时候 会发生rebalance
+		增加partition的时候（重新消费的时候如何保证读取消息的顺序）可能会重复消费或者丢失消息
+		
+		commits and offsets 确定正在消费消息的位置 
+			
+		auto commit： commit 默认开启  间隔5秒 没办法很好的控制
+		Sync Commit：
+		Async Commit： 异步的commit，但是不能确定commit是否成功 需要new OffsetCommitCallback方法
+
+
+Avro
+	资料序列化和反序列化的系统
+	是一种资料的格式
+	提供了丰富的资料的类型
+
+	好处：
+		强类型，可以跨语言传输，
+	缺点：
+		一些语言不支持，
+			
+	
+	Avro Record Schemas
+		name
+		namespace
+		doc
+		fields
+	Avro的文件类型
+		null,bollean,int32位,long64位,float,double,bytes8位,string,
+
+
+	define data schema
+	
+	定义Enums 文件
+	{“name”：“customer_status”,"type":"enum","symbols":["a","b","c"]} //symbols枚举值
+
+	定义Arrays 文件
+	{“name”：“email”,"type":"array","items":"string"}
+	
+	定义Maps 文件	key必须为String
+	{“name”：“secrets”,"type":"map","values":"string"}
+	
+	定义 Unions 文件  一个栏位可以有多个类型的文件
+	{“name”：“middle_name”,"type":["null","string"],"default":null}
+
+	定义 Logical 文件 符合逻辑的
+	decimals
+	date（int）
+	time-millis
+	timestap-millis
+
+	定义decimal文件 
+	{“name”：“unit_price”,"type":"bytes","logicalType":"decimal","precision":4,"scale":2} 
+
+
+Schema Evolution
+	4种类型
+		backward  
+		forward
+		full
+		breaking
+	
+	
+	
+
+

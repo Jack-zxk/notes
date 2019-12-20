@@ -1,0 +1,316 @@
+﻿	npm i -g supervisor   热部署插件
+
+CommonJs 规范	
+	模块引用  var math = require（‘math’）；
+	模块定义  exports对象用于导出当前模块的方法或者变量，在node中  一个文件就是一个模块
+	模块标识
+
+node的模块实现
+	两类：核心模块 文件模块
+	核心模块在源代码编译过程中 编译进执行文件  启动时 加载进入内存
+	文件模块 运行时动态加载 路径分析 文件定位 编译执行
+
+repl开发   dos命令行运行
+node 文件名称
+setTimeout(function(){
+	console.log(0);
+},);
+
+npm使用
+	npm list 查看安装哪些模块
+	npm install 
+	npm uninstall 
+	npm root 本地模块根目录
+	npm root -g 服务器所有模块根目录
+	npm update 【模块名称】
+	npm install express  
+
+回调函数：
+	同步操作文件（阻塞I/O）：
+	fs.readFileSync("文件名");
+
+	异步操作文件（非阻塞I/O）：
+
+
+事件驱动（events）：
+
+	evt.emit（‘’）； //触发事件
+
+
+
+模块自定义
+	定义方法和类   有没有this   有this为类   
+  		function name（）{
+	
+			}
+function函数
+	常用函数
+	function show（）{
+
+	}
+
+	匿名函数
+	show = function（）{
+	
+	}
+
+node的路由功能
+	connect框架
+		中间件 ：
+		
+			var connect = require('connect');
+			var app = connect();
+			app.use(logger); //logger所以一个方法
+			app.listen(3000);
+		可以使用中间件的顺序执行认证
+		
+		中间件挂载：对路径的操作。
+
+node的全局对象
+	
+	全局对象  
+		__filename 
+		__dirname
+		console方法 log,info,warn,error,  time-----timeEnd（计算消耗时间）
+		setTimeout 超时器
+		setInterval 定时器
+		process 查看进程
+		
+
+node的常用工具：
+	util.inspect //可以把json对象转换成json字符串
+	util. isArray();//是否是数组类型
+	util.isBoolean();//
+	util.isDate();//
+	util.isFunction();
+	util.isObject();
+	util.isRegExp();//判断正则表达式
+
+node的文件系统：
+
+	读文件内容
+		异步非阻塞读取
+		readFile（）
+		同步阻塞读取
+		readFileSync（）
+
+	写文件内容  异步写入
+	writeFile（）；
+
+	删除文件
+	unlink（）；
+
+	创建目录
+	mkdir（）；
+
+	删除目录
+	rmdir（）；
+
+
+node中get和post请求：
+
+	get请求中querystring.parse(); 将地址栏中的参数转换成json数据
+
+工具模块 
+      os模块
+	os.tmpdir();  服务器临时文件夹
+	os.hostname();电脑的主机名
+	os.type();    系统的类型
+	os.platform();平台
+	os.loadavg(); 平均负载  越小越好
+	os.totalmem(); 内存总量
+	os.freemem();  空闲内存总量
+	os.cpus();     cpu的参数
+	os.networkInterfaces();网卡接口列表
+
+      path模块
+	path.dirname();	 路径部分
+	path.basename(); 文件不部分
+	path.extname();	 后缀部分
+	path.parse();	 解析路径
+	path.format();	 路径反转  将json类型转换为正常的路径形式/user/root/index.txt 类型
+	
+	str.replace('','');字符串api  将第一个参数转换成第二个参数
+
+	es6  
+	=》表达式
+
+	show = function（）{} ----------  show=（）=》{}
+
+      dns模块
+	dns.loopup
+
+      net模块
+	通讯聊天模型
+
+
+	
+多进程架构
+
+	启动多进程
+		
+		var fork = require（‘child_process’）.fork;
+		var cpus = require（‘os’）.cpus（）；
+		fork.（*.js）
+	创建子进程
+	
+	spawn（）：启动一个子进程来执行命令
+	exec（）：启动一个子进程来执行命令，与spawn不同的是，具有一个回调函数来获知子进程的状况
+	execFile（）：启动一个子进程来执行可执行的文件
+	fork（）：与spawn类似，需要指定js文件模块
+
+		exec（）、execFile（）可以指定timeout时间
+
+	主线程与工作线程通过onmessage（）和postMessage（）通信
+	
+	子进程对象通过send（）方法实现主进程向子进程发送数据，message事件实现收听子进程发送来的数据
+
+	parent.js
+		var cp = require('child_process');
+		var n = cp.fork(__dirname+'/sub.js');
+		n.on('message',function(m){
+		console.log('parent got message:',m);
+			});
+		n.send({hello:'world'});
+		
+	sub.js
+		process.on('message',function(m){
+		console.log("child got message:",m);
+			});
+		process.send({foo:'bar'});
+		
+		
+    父子进程间的通信原理
+	
+	父进程在创建子进程前会先创建ipc通道并监听它，然后再真正创建出子进程，
+	并通过环境变量告诉子进程这个ipc通道的文件描述符，
+	子进程通过文件描述符来连接这个ipc通道，从而完成父子进程间的连接
+
+
+	句柄传递
+		实现多个进程监听同一个端口
+		child.send(message,[sendHandle])
+							将一个tcp服务器发送给子进程 示例代码：
+							主进程代码 
+								var child = require('child_process').fork('child.js'); 
+								// Open up the server object and send the handle 
+								var server = require('net').createServer(); 
+								server.on('connection', function (socket) {   
+								socket.end('handled by parent\n'); 
+								}); 
+								server.listen(1337, function () {   
+								child.send('server', server); }); 
+							子进程代码
+								process.on('message', function (m, server) {   
+								if (m === 'server') {     
+								server.on('connection', function (socket) {      
+								 socket.end('handled by child\n');     
+								 });   
+								 } 
+								 }); 
+	
+		子进程对象send（）方法  可以发送的句柄类型
+		net.Socket TCP套接字
+		net.Server TCP服务器 
+		dgram.Socket UDP套接字
+		
+		send()方法在将消息发送到IPC管道前，将消息组装成两个对象，
+		一个参数是handle，一个参数是message
+		
+		
+
+	Set 
+		Set类型数据类似数组，成员值是唯一的。
+		对set数据的操作
+		 var newSet = new Set（）；
+		 newSet.add();   //添加某个值
+		 newSet.delete（）；// 删除某一个值
+		 newSet.has(); 
+		 newSet.clear();
+		 
+	     使用set去除数组中的重复的值
+		 
+		 遍历set中的成员  获取值
+		 
+		 for(let newSet1 of set.keys()){
+		 
+		 }
+		 for(let newSet1 of set.values()){
+		 
+		 }
+		 
+		 由于set中不是键值对的数据  因此遍历keys（）和values（）获得的是相同的值
+		 for(let newSet1 of set.values()){
+			//获取的是map结构的数据  key和value相同
+		 }
+		 forEach方法用于对每个成员执行某种操作，没有返回值
+		 newSet.forEach((value,key)=> console.log())
+		 
+		 扩展运算符（...） 内部使用for...of循环，所以也可以用于set结构
+		 let newSet2 = [...newSet]
+		 
+	Map
+	
+	
+	
+	
+	
+	Promise
+	
+	Promise是异步编程的一种解决方案，比传统解决方案--回调函数和事件更加合理强大。
+	Promise简单来说就是一个容器，里面保存着某个未来才会结束的事件；从语法上来说，
+	Promise是一个对象，从它可以获取异步操作的消息。Promise对象是一个构造函数，用来生成Promise实例
+	缺点：
+		无法取消，一旦新建就会立即执行；
+		如果不设置回调函数，promise内部抛出的错误不会反应到外部
+	
+	Promise对象有两个特点：
+	1、对象的状态不受影响（具有三个状态：Pending进行中、Fulfilled已成功、Rejected已失败）
+	2、一旦状态改变就不会再变
+	
+	Promise构造函数接受一个函数作为参数，该函数的两个参数分别是resolve和reject；它们是两个函数，由js提供
+		resolve函数的作用是，将Promise对象的状态从未完成变为成功，在异步操作成功时，将异步操作的结果作为参数
+		传递出去；reject函数的作用是将Promise对象状态从未完成变为失败，是将错误信息作为参数传递出去
+	
+	let promise = new Promise(function(resolve,reject){
+		console.log('promise');
+		resolve();
+	});
+	promise.then(()=>{
+		console.log('resolve');
+	});
+	console.log('hi');
+	
+	then
+	then方法可以接受两个回调函数作为参数，第一个回调函数是Promise对象状态变为Resolved时调用，第二个回调函数
+	是Promise对象状态变为Rejected时调用，第二个回调函数是可选的
+	例子：
+	function timeout(ms){
+    return new Promise((resolve,reject)=>{
+			setTimeout(resolve,ms,'done');
+		});
+	}
+
+	timeout(100).then((value) =>{
+		console.log(value);
+	})
+	
+	then方法返回的是一个新的Promise实例（不是原来的那个）
+	getJSON（“/posts.json”）.then(function(json){
+		return json;
+	}).then(function(json){
+		//...
+	});
+	上面的例子中 第一个回调函数完成以后，会将返回结果作为参数传入第二个回调函数
+	
+	
+	catch方法
+	catch方法是.then(null,rejection)的别名，用于指定发生错误是的回调函数
+	getJSON（“/posts.json”）.then(function(json){
+		//...
+	}).catch(function(error){
+		//处理getJSON和前一个回调函数运行时发生的错误
+		console.log（'发生错误',error）；
+	});
+	一般来说  使用catch方法来捕获异常
+

@@ -1,0 +1,93 @@
+﻿Docker三大基础组件
+
+仓库（Repository）、镜像（Image）、容器	（Container）
+
+官方仓库存放镜像，利用镜像创建容器
+一个镜像可以创建若干个不同单功能相同的容器
+
+docker run --name MyWordPress --link db:mysql -p 8080:80 -d wordpress
+首先在本机查找有没有MyWordPress，没有的话到docker仓库查找该镜像，下载到本机
+基于WordPress镜像创建容器MyWordPress，提供个人博客服务
+
+Docker指令的基本用法：
+ docker + 命令关键字（COMMAND) + 一系列的参数（【arg... 】）
+ build pull run
+ 
+ 组织结构 （比较复杂）
+  首先启动一个守护进程（Docker Daemon），所有的容器都被守护进程控制，
+  同时守护进程监听并接收Docker客户（Docker Client）端指令，
+  并把执行结果返回给Docker客户端
+  
+  
+Docker pull ubuntu：18.04  从仓库获取镜像 18.04为版本号，如果不加为最新版（Docker pull registry.hub.docker.com/ubuntu：18.04 ）
+
+docker images  列出镜像
+包含的信息：TAG、IMAGE ID等 tag 版本信息 image id 唯一标识镜像
+
+docker tag ubuntu:latest  myubuntu:latest  添加新的镜像标签
+			旧的标签名       新的标签名 
+
+docker [image] inspect ubuntu:18.04 获取该镜像的详细信息
+
+			
+docker search [option] keyword 搜索官方仓库中的镜像
+
+docker rmi 【镜像tag或者id】 删除镜像  会删除镜像的标签副本 如果只剩一个的话会彻底删除镜像
+如果镜像存在容器的话 是无法删除成功的 可以使用docker rmi -f 镜像名
+
+docker image prune -f  清除镜像
+
+创建镜像
+	 commit、 import和build 
+	 
+基于已有容器创建
+docker [container] commit -m "Added a new file" -a "Docker Newbee" a925cb40b3f0 test:0.1 
+																	已有容器id
+															
+基于本地模板导入
+cat ubuntu-18.04-x86_64-minimal.tar.gz | docker import - ubuntu:lB.04 
+基于Dockerfile创建
+命令 ：略
+
+
+创建容器
+
+	create、 start、 run, wait 和 logs 
+	
+新建容器：
+	docker create -it ubuntu：latest
+启动容器：
+	docker start af
+新建并启动容器
+	docker run ubuntu /bin/echo 'hello world'
+		当利用 docker [container] run 来创建并启动容器时，
+		Docker 在后台运行的标准 操作包括：
+		口检查本地是否存在指定的镜像，不存在就从公有仓库下载；
+		口利用镜像创建一个容器，并启动该容器； 
+		口分配一个文件系统给容器，并在只读的镜像层外面挂载一层可读写层；
+		口从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去； 
+		口从网桥的地址池配置一个 IP 地址给容器； 
+		口执行用户指定的应用程序； 
+		口执行完毕后容器被自动终止。
+		
+查看容器输出
+	docker logs 镜像id
+	
+停止容器
+	Docker 容器的 pause/unpause、 stop 和 prune 子命令。
+	
+	暂停容器
+	 docker pause test 	
+	终止容器
+	docker stop ce5 
+	
+进入容器
+	推荐使用官方的 attach 或 exec 命令。
+	docker attach 容器名
+	
+	
+
+
+
+
+	
